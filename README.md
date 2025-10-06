@@ -1,4 +1,4 @@
-# Document Research & Theme Identification Chatbot
+# Document Research & Theme Synthesizer
 
 ## Live Demo: https://wasserstoff-mu.vercel.app
 
