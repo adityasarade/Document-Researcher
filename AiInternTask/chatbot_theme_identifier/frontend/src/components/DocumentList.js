@@ -4,6 +4,7 @@ import {
   Checkbox,
   List,
   ListItem,
+  ListItemButton,
   ListItemText,
   TextField,
   Typography,
@@ -79,17 +80,15 @@ const DocumentList = ({
 
       <List dense>
         {displayed.map((d) => (
-          <ListItem
-            key={d.doc_id}
-            button
-            onClick={() => toggle(d.doc_id)}
-          >
-            <Checkbox
-              edge="start"
-              checked={selected.includes(d.doc_id)}
-              tabIndex={-1}
-            />
-            <ListItemText primary={d.filename} secondary={d.doc_id} />
+          <ListItem key={d.doc_id} disablePadding>
+            <ListItemButton onClick={() => toggle(d.doc_id)}>
+              <Checkbox
+                edge="start"
+                checked={selected.includes(d.doc_id)}
+                tabIndex={-1}
+              />
+              <ListItemText primary={d.filename} secondary={d.doc_id} />
+            </ListItemButton>
           </ListItem>
         ))}
         {displayed.length === 0 && (

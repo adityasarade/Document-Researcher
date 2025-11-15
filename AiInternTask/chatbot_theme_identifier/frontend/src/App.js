@@ -31,12 +31,6 @@ function App() {
     api.post("/clear/").catch(console.error);
   }, []);
 
-  useEffect(() => {
-  fetch("https://adityasarade-wasserstoff.hf.space/reset/", { method: "POST" })
-    .then(res => console.log("Reset done"))
-    .catch(console.error);
-}, []);
-
   const handleSearch = async (query) => {
     try {
       const params = { query, top_k: 5 };
