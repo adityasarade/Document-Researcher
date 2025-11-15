@@ -25,6 +25,7 @@ function App() {
   const [selectedDocs, setSelectedDocs] = useState([]);
   const [docsVersion, setDocsVersion] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(true);
+  const [searching, setSearching] = useState(false);
 
   // Clear backend knowledge base on every full page load
   useEffect(() => {
@@ -32,6 +33,7 @@ function App() {
   }, []);
 
   const handleSearch = async (query) => {
+    setSearching(true);
     try {
       const params = { query, top_k: 5 };
       if (selectedDocs.length) params.doc_ids = selectedDocs.join(",");
@@ -39,7 +41,9 @@ function App() {
       setResults(resp.data);
     } catch (err) {
       console.error("Search failed", err);
-      setResults(null);
+      setResults({ error: "Search failed. Please try again." });
+    } finally {
+      setSearching(false);
     }
   };
 
@@ -143,19 +147,45 @@ function App() {
               }}
             >
               {/* Header */}
-              <Box sx={{ textAlign: "center", mb: 3 }}>
-                <Typography variant="h4" gutterBottom>
-                  Document Research & Theme Identification Chatbot
+              <Box sx={{ textAlign: "center", mb: 4 }}>
+                <Typography
+                  variant="h3"
+                  gutterBottom
+                  sx={{
+                    fontWeight: 700,
+                    background: 'linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)',
+                    backgroundClip: 'text',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    mb: 2
+                  }}
+                >
+                  Document Research Assistant
                 </Typography>
-                <Typography variant="subtitle1" color="textSecondary">
-                  Upload your documents, ask any question in natural language, and let us find your answers and comprehensive themes along with precise citations.
+                <Typography variant="h6" color="textSecondary" sx={{ fontWeight: 400, lineHeight: 1.6 }}>
+                  Upload documents, ask questions in natural language, and get AI-powered answers with precise citations
                 </Typography>
               </Box>
 
               {/* Actions & Results */}
-              <Box display="flex" flexDirection="column" gap={3}>
+              <Box display="flex" flexDirection="column" gap={4}>
                 <UploadPage onUploadSuccess={() => setDocsVersion((v) => v + 1)} />
-                <SearchBar onSearch={handleSearch} />
+                <SearchBar onSearch={handleSearch} searching={searching} />
+
+                {results?.error && (
+                  <Box
+                    sx={{
+                      p: 3,
+                      bgcolor: 'error.light',
+                      color: 'error.dark',
+                      borderRadius: 2,
+                      textAlign: 'center'
+                    }}
+                  >
+                    <Typography variant="body1">{results.error}</Typography>
+                  </Box>
+                )}
+
                 {results?.individual_results && (
                   <ResultsTable rows={results.individual_results} />
                 )}
