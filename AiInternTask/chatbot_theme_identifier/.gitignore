@@ -20,3 +20,5 @@ Thumbs.db
 
 # Env config
 .env.local
+
+backend/data/

@@ -109,43 +109,14 @@ const DocumentList = ({
 
       <List dense>
         {displayed.map((d) => (
-          <ListItem
-            key={d.doc_id}
-            disablePadding
-            sx={{ mb: 0.5 }}
-          >
-            <ListItemButton
-              onClick={() => toggle(d.doc_id)}
-              sx={{
-                borderRadius: 1,
-                border: '1px solid',
-                borderColor: selected.includes(d.doc_id) ? 'primary.main' : 'divider',
-                bgcolor: selected.includes(d.doc_id) ? 'primary.lighter' : 'background.paper',
-                '&:hover': {
-                  bgcolor: selected.includes(d.doc_id) ? 'primary.light' : 'action.hover',
-                },
-                transition: 'all 0.2s'
-              }}
-            >
+          <ListItem key={d.doc_id} disablePadding>
+            <ListItemButton onClick={() => toggle(d.doc_id)}>
               <Checkbox
                 edge="start"
                 checked={selected.includes(d.doc_id)}
                 tabIndex={-1}
-                color="primary"
               />
-              <ListItemText
-                primary={d.filename}
-                secondary={d.doc_id}
-                primaryTypographyProps={{
-                  fontSize: '0.85rem',
-                  fontWeight: selected.includes(d.doc_id) ? 600 : 400,
-                  noWrap: true
-                }}
-                secondaryTypographyProps={{
-                  fontSize: '0.7rem',
-                  noWrap: true
-                }}
-              />
+              <ListItemText primary={d.filename} secondary={d.doc_id} />
             </ListItemButton>
           </ListItem>
         ))}
