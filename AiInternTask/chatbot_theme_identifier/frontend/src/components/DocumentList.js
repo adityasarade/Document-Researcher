@@ -9,7 +9,12 @@ import {
   TextField,
   Typography,
   Toolbar,
+  Chip,
+  Divider,
+  InputAdornment
 } from "@mui/material";
+import FolderIcon from "@mui/icons-material/Folder";
+import SearchIcon from "@mui/icons-material/Search";
 import api from "../api";
 
 const DocumentList = ({
@@ -50,51 +55,106 @@ const DocumentList = ({
   return (
     <Box
       sx={{
-        width: 300,                  // Drawer width
-        p: 2,                        // inner padding
+        width: 300,
+        p: 2,
         overflowY: "auto",
-        height: "calc(100vh - 64px)" // full viewport minus AppBar (64px)
+        height: "calc(100vh - 64px)",
+        bgcolor: '#fafafa'
       }}
     >
-      {/* pushes content below your AppBar */}
       <Toolbar />
 
       {showFilter && (
         <>
-        <Typography
-          variant="h6"
-          sx={{ mb: 1, fontWeight: "bold", textAlign: "center" }}
-          >
-            Document List
-        </Typography>
-        <TextField
-          fullWidth
-          size="small"
-          placeholder="Search documents…"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          sx={{ mb: 2 }}
-        />
+          <Box sx={{ mb: 2, textAlign: "center" }}>
+            <FolderIcon sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
+            <Typography
+              variant="h6"
+              sx={{ mb: 0.5, fontWeight: 700, color: 'text.primary' }}
+            >
+              Knowledge Base
+            </Typography>
+            <Chip
+              label={`${docs.length} document${docs.length !== 1 ? 's' : ''}`}
+              size="small"
+              color="primary"
+              variant="outlined"
+            />
+          </Box>
+
+          <Divider sx={{ mb: 2 }} />
+
+          <TextField
+            fullWidth
+            size="small"
+            placeholder="Search documents…"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            sx={{
+              mb: 2,
+              '& .MuiOutlinedInput-root': {
+                bgcolor: 'background.paper'
+              }
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" />
+                </InputAdornment>
+              ),
+            }}
+          />
         </>
       )}
 
       <List dense>
         {displayed.map((d) => (
-          <ListItem key={d.doc_id} disablePadding>
-            <ListItemButton onClick={() => toggle(d.doc_id)}>
+          <ListItem
+            key={d.doc_id}
+            disablePadding
+            sx={{ mb: 0.5 }}
+          >
+            <ListItemButton
+              onClick={() => toggle(d.doc_id)}
+              sx={{
+                borderRadius: 1,
+                border: '1px solid',
+                borderColor: selected.includes(d.doc_id) ? 'primary.main' : 'divider',
+                bgcolor: selected.includes(d.doc_id) ? 'primary.lighter' : 'background.paper',
+                '&:hover': {
+                  bgcolor: selected.includes(d.doc_id) ? 'primary.light' : 'action.hover',
+                },
+                transition: 'all 0.2s'
+              }}
+            >
               <Checkbox
                 edge="start"
                 checked={selected.includes(d.doc_id)}
                 tabIndex={-1}
+                color="primary"
               />
-              <ListItemText primary={d.filename} secondary={d.doc_id} />
+              <ListItemText
+                primary={d.filename}
+                secondary={d.doc_id}
+                primaryTypographyProps={{
+                  fontSize: '0.85rem',
+                  fontWeight: selected.includes(d.doc_id) ? 600 : 400,
+                  noWrap: true
+                }}
+                secondaryTypographyProps={{
+                  fontSize: '0.7rem',
+                  noWrap: true
+                }}
+              />
             </ListItemButton>
           </ListItem>
         ))}
         {displayed.length === 0 && (
-          <Typography variant="body2" color="text.secondary">
-            No documents match.
-          </Typography>
+          <Box sx={{ textAlign: 'center', py: 4 }}>
+            <Typography variant="body2" color="text.secondary">
+              No documents match your search
+            </Typography>
+          </Box>
         )}
       </List>
     </Box>
