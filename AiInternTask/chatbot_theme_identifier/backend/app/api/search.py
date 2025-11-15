@@ -15,8 +15,12 @@ async def search_documents(
         description="Comma-separated list of document IDs to restrict the search to"
     )
 ):
-    # Parse optional doc filter
-    selected = doc_ids.split(",") if doc_ids else None
+    # Parse optional doc filter - handle empty strings and None
+    selected = None
+    if doc_ids and doc_ids.strip():
+        selected = [d.strip() for d in doc_ids.split(",") if d.strip()]
+        if not selected:  # If all were empty after stripping
+            selected = None
 
     # Vector search + initial rerank/filter
     raw_chunks = search(query, top_k=top_k, doc_ids=selected)

@@ -18,14 +18,13 @@ def startup_initialize_vector_store():
     This ensures no old documents persist across restarts.
     """
     init_vector_store()
-            
-@app.get("/")
-def root():
-    return JSONResponse({"status": "ok"})
 
+# CORS configuration - allow frontend origins
 origins = [
-    "http://localhost:3000",
-    "https://wasserstoff-qicf.onrender.com"
+    "http://localhost:3000",                          # Local development
+    "https://wasserstoff-mu.vercel.app",              # Vercel production
+    "https://vercel.com",                             # Vercel preview deployments
+    "https://*.vercel.app",                           # Vercel preview branches
 ]
 app.add_middleware(
     CORSMiddleware,
@@ -37,10 +36,10 @@ app.add_middleware(
 
 # Include routes
 app.include_router(maintenance_router, prefix="", tags=["maintenance"])
-app.include_router(upload_router)  
+app.include_router(upload_router)
 app.include_router(search_router)
-app.include_router(docs_router)  
+app.include_router(docs_router)
 
 @app.get("/")
 def read_root():
-    return {"message": "Server is up and running!"}
+    return {"status": "ok", "message": "Document Research API is running"}

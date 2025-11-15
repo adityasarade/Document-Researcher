@@ -11,6 +11,13 @@ load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
+# Validate API key on module load
+if not GROQ_API_KEY:
+    raise ValueError(
+        "GROQ_API_KEY environment variable is not set. "
+        "Please set it in your environment or .env file."
+    )
+
 def truncate_text(text: str, max_tokens: int = None) -> str:
     """
     We need to trim down the input so that we dont hit the token limit of Groq
@@ -40,17 +47,31 @@ def query_llm(system_prompt: str, user_prompt: str, model: str = None) -> str:
 
     max_retries = 3
     for attempt in range(max_retries):
-        response = requests.post(GROQ_API_URL, headers=headers, json=payload, verify=False)
-        if response.status_code == 429:
-            wait = 2 ** attempt  # exponential back-off: 1s, 2s, 4s
-            time.sleep(wait)
-            continue
         try:
+            # Add timeout to prevent hanging, enable SSL verification for security
+            response = requests.post(
+                GROQ_API_URL,
+                headers=headers,
+                json=payload,
+                timeout=30,  # 30 second timeout
+                verify=True   # Enable SSL certificate verification
+            )
+
+            if response.status_code == 429:
+                wait = 2 ** attempt  # exponential back-off: 1s, 2s, 4s
+                time.sleep(wait)
+                continue
+
             response.raise_for_status()
+            return response.json()["choices"][0]["message"]["content"]
+
+        except requests.exceptions.Timeout:
+            if attempt == max_retries - 1:
+                raise Exception("Request to LLM timed out after 30 seconds")
+            continue
         except HTTPError as e:
             # re-raise non-rate-limit errors immediately
             raise
-        return response.json()["choices"][0]["message"]["content"]
 
     # If we get here, we retried max_retries times
     raise Exception("Rate limit exceeded. Please try again later.")
